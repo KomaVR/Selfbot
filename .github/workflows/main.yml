@@ -5,31 +5,12 @@ on:
     - cron: "* * * * *"
   workflow_dispatch:
 
+concurrency:
+  group: discord-bot-singleton
+  cancel-in-progress: false
+
 jobs:
-  prevent-overlap:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Check for running workflow
-        uses: actions/github-script@v7
-        id: check
-        with:
-          script: |
-            const runs = await github.rest.actions.listWorkflowRuns({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'discord-bot.yml',
-              status: 'in_progress'
-            });
-
-            const isRunning = runs.data.total_count > 0;
-            core.setOutput('running', isRunning);
-
   run-bot:
-    needs: prevent-overlap
-    if: needs.prevent-overlap.outputs.running == 'false'
     runs-on: ubuntu-latest
 
     steps:
