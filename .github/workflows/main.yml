@@ -1,8 +1,8 @@
-name: Run Discord Bot Every 5 Minutes
+name: Run Discord Bot Every Minute
 
 on:
   schedule:
-    - cron: "*/1 * * * *"
+    - cron: "* * * * *"
   workflow_dispatch:
 
 jobs:
