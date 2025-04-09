@@ -11,24 +11,54 @@ class CustomHelpCommand(commands.HelpCommand):
     async def send_bot_help(self, mapping):
         ctx = self.context
         help_message = "**Self-Bot Commands:**\n"
+        pages = []
+        current_page = ""
+
+        # Loop through commands to gather help messages and split them into pages
         for cog, commands_list in mapping.items():
             filtered = await self.filter_commands(commands_list, sort=True)
             if filtered:
                 cog_name = cog.qualified_name if cog else "No Category"
-                help_message += f"\n**{cog_name}**:\n"
+                current_page += f"\n**{cog_name}**:\n"
                 for command in filtered:
-                    help_message += f"`!{command.name}` - {command.help or 'No description provided.'}\n"       
-        await ctx.send(f"```\n{help_message}\n```")
+                    command_help = f"`!{command.name}` - {command.help or 'No description provided.'}\n"
+                    if len(current_page + command_help) > 2000:
+                        pages.append(current_page.strip())
+                        current_page = command_help  # Start new page
+                    else:
+                        current_page += command_help
+
+        # Append the final page if there's any content left
+        if current_page.strip():
+            pages.append(current_page.strip())
+
+        # Send paginated messages
+        for page in pages:
+            await ctx.send(f"```\n{page}\n```")
+
     async def send_cog_help(self, cog):
         ctx = self.context
         filtered = await self.filter_commands(cog.get_commands(), sort=True)
         if filtered:
             help_message = f"**{cog.qualified_name} Commands:**\n"
+            pages = []
+            current_page = ""
+
             for command in filtered:
-                help_message += f"`!{command.name}` - {command.help or 'No description provided.'}\n"
+                command_help = f"`!{command.name}` - {command.help or 'No description provided.'}\n"
+                if len(current_page + command_help) > 2000:
+                    pages.append(current_page.strip())
+                    current_page = command_help
+                else:
+                    current_page += command_help
+
+            if current_page.strip():
+                pages.append(current_page.strip())
+
+            for page in pages:
+                await ctx.send(f"```\n{page}\n```")
         else:
-            help_message = "No commands found in this category."
-        await ctx.send(f"```\n{help_message}\n```")
+            await ctx.send("No commands found in this category.")
 
     async def send_command_help(self, command):
         ctx = self.context
@@ -36,10 +66,15 @@ class CustomHelpCommand(commands.HelpCommand):
         help_message += f"**Description:** {command.help or 'No description provided.'}\n"
         if command.aliases:
             help_message += f"**Aliases:** {', '.join(command.aliases)}\n"
-        help_message += f"**Usage:** `!{command.qualified_name} {command.signature}`\n"
-        await ctx.send(f"```\n{help_message}\n```")
+        help_message += f"**Usage:** `!{command.qualified_name} {command.signature}`"
+        # Split the help message into pages if necessary
+        if len(help_message) > 2000:
+            pages = [help_message[i:i+2000] for i in range(0, len(help_message), 2000)]
+            for page in pages:
+                await ctx.send(f"```\n{page}\n```")
+        else:
+            await ctx.send(f"```\n{help_message}\n```")
 
-client = commands.Bot(command_prefix="!", self_bot=True, help_command=CustomHelpCommand())
 
 operators = {
     ast.Add: operator.add,
