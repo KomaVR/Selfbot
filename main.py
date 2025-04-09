@@ -653,5 +653,10 @@ async def gemma(ctx, *, question):
     response = "**AI Response: **" + reply 
     await send_long_message(ctx, response)
 
+@client.command(help="Ask ai model gemma a question.")
+async def meta_ai(ctx, *, question):
+    reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", question)
+    response = "**AI Response: **" + reply 
+    await send_long_message(ctx, response)
 # ----- Here it runs your token as a selfbot -----
 client.run(token, bot=False)
