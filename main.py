@@ -8,6 +8,7 @@ from discord.ext import commands
 token = "OTE2NTQxMzU2MjgzOTI4NjM3.GVtuZI.guQsqDnkqEGGqfUGcdr_QGPmns8HtKSuaVQ9Po"
 GROQ_API_KEY = "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"
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+intents = discord.Intents.all()
 
 HEADERS = {
     "Authorization": f"Bearer {GROQ_API_KEY}",
@@ -100,7 +101,7 @@ class CustomHelpCommand(commands.HelpCommand):
         await self.send_output(ctx, help_message)
 
 # ----- Bot Instance we need this it also holds the prefix if you wanna chamge it-----
-client = commands.Bot(command_prefix="!", self_bot=True, help_command=CustomHelpCommand())
+client = commands.Bot(command_prefix="!", self_bot=True, help_command=CustomHelpCommand(), intents=intents)
 
 # ----- This is for the calc command just ignore this -----
 operators = {
