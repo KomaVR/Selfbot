@@ -7,7 +7,6 @@ from discord.ext import commands
 
 token = "OTE2NTQxMzU2MjgzOTI4NjM3.GVtuZI.guQsqDnkqEGGqfUGcdr_QGPmns8HtKSuaVQ9Po"
 
-# ----- Pagination Helper -----
 def paginate_text(text, max_length=1500):
     lines = text.splitlines()
     pages = []
@@ -30,9 +29,9 @@ def paginate_text(text, max_length=1500):
         pages.append(current_page)
     return pages
 
-# ----- Custom Help Command with Conditional Pagination -----
 class CustomHelpCommand(commands.HelpCommand):
-    """Custom help command with conditional pagination"""
+    """Custom help command I used ai to write the 
+       tooltips that would of taken Forever"""
 
     async def send_output(self, ctx, content):
         pages = paginate_text(content, max_length=1500)
@@ -74,10 +73,10 @@ class CustomHelpCommand(commands.HelpCommand):
         help_message += f"**Usage:** `!{command.qualified_name} {command.signature}`\n"
         await self.send_output(ctx, help_message)
 
-# ----- Bot Instance with Custom Help -----
+# ----- Bot Instance we need this it also holds the prefix if you wanna chamge it-----
 client = commands.Bot(command_prefix="!", self_bot=True, help_command=CustomHelpCommand())
 
-
+# ----- This is for the calc command just ignore this -----
 operators = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
@@ -90,6 +89,7 @@ operators = {
 
 start_time = datetime.utcnow()
 
+# ----- This is just some error handling lol -----
 def eval_expr(expr):
     def _eval(node):
         if isinstance(node, ast.Num):
@@ -101,7 +101,8 @@ def eval_expr(expr):
         else:
             raise TypeError("Unsupported operation")
     return _eval(ast.parse(expr, mode='eval').body)
-
+# ----- This makes things that need target user more universal -----
+# ----- it takes mentions and user ids -----
 def resolve_member(ctx, user: str = None):
     target = None
     if user is None:
@@ -124,8 +125,10 @@ async def on_ready():
     print('Self Bot Ready for action')
     print('+--------------------------------------+')
     print('| Prefix is: !                         |')
+    print('| Type: !help for a list of commands   |')
     print('+--------------------------------------+')
 
+# ----- Below is were the commands are you can add more if you need/want -----
 @client.command(help="Replies with Pong and latency.")
 async def pingpong(ctx):
     print('ping command sent. Replying pong')
@@ -317,7 +320,7 @@ async def rapiddelete(ctx, *, substring: str):
             count += 1
     await ctx.send(f"Rapid delete complete. Deleted {count} messages containing '{substring}'.")
 
-@client.command(help="Scrapes unique URLs from recent messages.")
+@client.command(help="Scrapes unique URLs from recent messages.") # This is byfar my favorite command.
 async def scrapelinks(ctx, limit: int = 100):
     links = []
     async for msg in ctx.channel.history(limit=limit):
@@ -327,7 +330,7 @@ async def scrapelinks(ctx, limit: int = 100):
     if links:
         unique_links = list(set(links))
         wrapped_links = [f"[{link}]" for link in unique_links]
-        max_length = 4000
+        max_length = 2000
         def chunk_text(items, max_len):
             chunks = []
             current_chunk = []
@@ -395,7 +398,7 @@ async def markov(ctx, limit: int = 100):
 async def selfdestruct(ctx, delay: int):
     await ctx.send(f"Initiating self-destruct in {delay} seconds...")
     await asyncio.sleep(delay)
-    msg = await ctx.send("Boom! 💥")
+    msg = await ctx.send("Boom! 💥") # this was a ai idea dont ask why i made this 😭
     await asyncio.sleep(1)
     await msg.delete()
 
@@ -424,6 +427,7 @@ async def randomness(ctx):
         "Time travel is just a myth, right?",
         "Bananas are blue in another universe.",
         "Reality is just a simulation!"
+        # ----- I plan on adding more nonsense here soon LMAO 😂 -----
     ]
     await ctx.send(random.choice(messages))
 
@@ -475,12 +479,12 @@ async def countdown(ctx, seconds: int):
 
 @client.command(help="Sends a random emoji.")
 async def randomemoji(ctx):
-    emojis = ["😄", "🔥", "🚀", "🎉", "🤖", "👾"]
+    emojis = ["😄", "🔥", "🚀", "🎉", "🤖", "👾"] # ----- I plan on adding more soon -----
     await ctx.send(random.choice(emojis))
 
 @client.command(help="Creates a mosaic of random emojis.")
 async def emojiart(ctx, rows: int = 5, cols: int = 10):
-    emojis = ["😄", "🔥", "🚀", "🎉", "🤖", "👾"]
+    emojis = ["😄", "🔥", "🚀", "🎉", "🤖", "👾"] # ----- I plan on adding more soon -----
     art = "\n".join("".join(random.choice(emojis) for _ in range(cols)) for _ in range(rows))
     await ctx.send(art)
 
@@ -601,7 +605,9 @@ async def randomfact(ctx):
         "Bananas are berries but strawberries are not.",
         "Octopuses have three hearts.",
         "There are more stars in the universe than grains of sand on Earth."
+        # ----- I plan on adding more soon 😂 -----
     ]
     await ctx.send(random.choice(facts))
 
+# ----- Here it runs your token as a selfbot -----
 client.run(token, bot=False)
