@@ -1,4 +1,4 @@
-import discord, time, random, re, string, ast, os, asyncio
+import discord, time, random, re, string, ast, os, asyncio, requests
 from gtts import gTTS
 from datetime import datetime, timedelta
 import operator
