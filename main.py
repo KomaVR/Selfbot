@@ -635,7 +635,7 @@ async def randomfact(ctx):
     ]
     await ctx.send(random.choice(facts))
     
-@client.command(help="Ask ai model mixtral a question.")
+@client.command(help="Ask ai model deepseek a question.")
 async def deepseek(ctx, *, question):
     reply = query_groq("deepseek-r1-distill-qwen-32b", question)
     await send_long_message(ctx, reply)
