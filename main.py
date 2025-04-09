@@ -7,58 +7,68 @@ from discord.ext import commands
 
 token = "OTE2NTQxMzU2MjgzOTI4NjM3.GVtuZI.guQsqDnkqEGGqfUGcdr_QGPmns8HtKSuaVQ9Po"
 
+# ----- Pagination Helper Function -----
+def paginate_text(text, max_length=1500):
+    """
+    Splits the input text into a list of pages, each no longer than max_length.
+    This function attempts to split by newline if possible.
+    """
+    lines = text.splitlines()
+    pages = []
+    current_page = ""
+    for line in lines:
+        # If line alone is longer than max_length, split it further.
+        if len(line) > max_length:
+            for i in range(0, len(line), max_length):
+                piece = line[i:i+max_length]
+                if current_page:
+                    pages.append(current_page)
+                    current_page = ""
+                pages.append(piece)
+        else:
+            if len(current_page) + len(line) + 1 > max_length:
+                pages.append(current_page)
+                current_page = line + "\n"
+            else:
+                current_page += line + "\n"
+    if current_page:
+        pages.append(current_page)
+    return pages
+
+# ----- Custom Help Command with Pagination -----
 class CustomHelpCommand(commands.HelpCommand):
+    """Custom help command with pagination; each page has at most 1500 characters."""
+    
+    async def send_pages(self, pages, ctx):
+        total = len(pages)
+        for i, page in enumerate(pages, start=1):
+            # Wrap page with a code block and include page number
+            await ctx.send(f"```\nPage {i}/{total}\n{page}\n```")
+
     async def send_bot_help(self, mapping):
         ctx = self.context
         help_message = "**Self-Bot Commands:**\n"
-        pages = []
-        current_page = ""
-
-        # Loop through commands to gather help messages and split them into pages
         for cog, commands_list in mapping.items():
             filtered = await self.filter_commands(commands_list, sort=True)
             if filtered:
                 cog_name = cog.qualified_name if cog else "No Category"
-                current_page += f"\n**{cog_name}**:\n"
+                help_message += f"\n**{cog_name}**:\n"
                 for command in filtered:
-                    command_help = f"`!{command.name}` - {command.help or 'No description provided.'}\n"
-                    if len(current_page + command_help) > 2000:
-                        pages.append(current_page.strip())
-                        current_page = command_help  # Start new page
-                    else:
-                        current_page += command_help
-
-        # Append the final page if there's any content left
-        if current_page.strip():
-            pages.append(current_page.strip())
-
-        # Send paginated messages
-        for page in pages:
-            await ctx.send(f"```\n{page}\n```")
+                    help_message += f"`!{command.name}` - {command.help or 'No description provided.'}\n"
+        pages = paginate_text(help_message, max_length=1500)
+        await self.send_pages(pages, ctx)
 
     async def send_cog_help(self, cog):
         ctx = self.context
         filtered = await self.filter_commands(cog.get_commands(), sort=True)
         if filtered:
             help_message = f"**{cog.qualified_name} Commands:**\n"
-            pages = []
-            current_page = ""
-
             for command in filtered:
-                command_help = f"`!{command.name}` - {command.help or 'No description provided.'}\n"
-                if len(current_page + command_help) > 2000:
-                    pages.append(current_page.strip())
-                    current_page = command_help
-                else:
-                    current_page += command_help
-
-            if current_page.strip():
-                pages.append(current_page.strip())
-
-            for page in pages:
-                await ctx.send(f"```\n{page}\n```")
+                help_message += f"`!{command.name}` - {command.help or 'No description provided.'}\n"
         else:
-            await ctx.send("No commands found in this category.")
+            help_message = "No commands found in this category."
+        pages = paginate_text(help_message, max_length=1500)
+        await self.send_pages(pages, ctx)
 
     async def send_command_help(self, command):
         ctx = self.context
@@ -66,15 +76,12 @@ class CustomHelpCommand(commands.HelpCommand):
         help_message += f"**Description:** {command.help or 'No description provided.'}\n"
         if command.aliases:
             help_message += f"**Aliases:** {', '.join(command.aliases)}\n"
-        help_message += f"**Usage:** `!{command.qualified_name} {command.signature}`"
-        # Split the help message into pages if necessary
-        if len(help_message) > 2000:
-            pages = [help_message[i:i+2000] for i in range(0, len(help_message), 2000)]
-            for page in pages:
-                await ctx.send(f"```\n{page}\n```")
-        else:
-            await ctx.send(f"```\n{help_message}\n```")
+        help_message += f"**Usage:** `!{command.qualified_name} {command.signature}`\n"
+        pages = paginate_text(help_message, max_length=1500)
+        await self.send_pages(pages, ctx)
 
+# ----- Bot Instance with Custom Help -----
+client = commands.Bot(command_prefix="!", self_bot=True, help_command=CustomHelpCommand())
 
 operators = {
     ast.Add: operator.add,
