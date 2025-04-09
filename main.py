@@ -5,7 +5,7 @@ import operator
 from collections import Counter
 from discord.ext import commands
 
-token = "OTE2NTQxMzU2MjgzOTI4NjM3.GVtuZI.guQsqDnkqEGGqfUGcdr_QGPmns8HtKSuaVQ9Po"
+token = "OTE2NTQxMzU2MjgzOTI4NjM3.GBFA4F.7lejtSq08Lvj-WctdqtCrvbg3bjB_QrxJvy_J0"
 GROQ_API_KEY = "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"
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 
