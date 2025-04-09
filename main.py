@@ -6,6 +6,32 @@ from collections import Counter
 from discord.ext import commands
 
 token = "OTE2NTQxMzU2MjgzOTI4NjM3.GVtuZI.guQsqDnkqEGGqfUGcdr_QGPmns8HtKSuaVQ9Po"
+GROQ_API_KEY = "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"
+GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+
+HEADERS = {
+    "Authorization": f"Bearer {GROQ_API_KEY}",
+    "Content-Type": "application/json"
+}
+
+def query_groq(model: str, question: str) -> str:
+    payload = {
+        "model": model,
+        "messages": [{"role": "user", "content": question}],
+        "temperature": 0.7
+    }
+
+    response = requests.post(GROQ_API_URL, headers=HEADERS, json=payload)
+
+    if response.status_code == 200:
+        return response.json()['choices'][0]['message']['content']
+    else:
+        return f"Error {response.status_code}: {response.text}"
+
+async def send_long_message(ctx, content: str):
+    chunks = [content[i:i+2000] for i in range(0, len(content), 2000)]
+    for chunk in chunks:
+        await ctx.send(chunk)
 
 def paginate_text(text, max_length=1500):
     lines = text.splitlines()
@@ -608,6 +634,21 @@ async def randomfact(ctx):
         # ----- I plan on adding more soon 😂 -----
     ]
     await ctx.send(random.choice(facts))
+    
+@client.command(help="Ask ai model mixtral a question.")
+async def mixtral(ctx, *, question):
+    reply = query_groq("mixtral-8x7b-32768", question)
+    await send_long_message(ctx, reply)
+
+@client.command(help="Ask ai model llama a question.")
+async def llama(ctx, *, question):
+    reply = query_groq("llama2-70b-4096", question)
+    await send_long_message(ctx, reply)
+
+@client.command(help="Ask ai model gemma a question.")
+async def gemma(ctx, *, question):
+    reply = query_groq("gemma-7b-it", question)
+    await send_long_message(ctx, reply)
 
 # ----- Here it runs your token as a selfbot -----
 client.run(token, bot=False)
