@@ -636,18 +636,18 @@ async def randomfact(ctx):
     await ctx.send(random.choice(facts))
     
 @client.command(help="Ask ai model mixtral a question.")
-async def mixtral(ctx, *, question):
-    reply = query_groq("mixtral-8x7b-32768", question)
+async def deepseek(ctx, *, question):
+    reply = query_groq("deepseek-r1-distill-qwen-32b", question)
     await send_long_message(ctx, reply)
 
 @client.command(help="Ask ai model llama a question.")
 async def llama(ctx, *, question):
-    reply = query_groq("llama2-70b-4096", question)
+    reply = query_groq("llama-3.3-70b-versatile", question)
     await send_long_message(ctx, reply)
 
 @client.command(help="Ask ai model gemma a question.")
 async def gemma(ctx, *, question):
-    reply = query_groq("gemma-7b-it", question)
+    reply = query_groq("gemma2-9b-it", question)
     await send_long_message(ctx, reply)
 
 # ----- Here it runs your token as a selfbot -----
