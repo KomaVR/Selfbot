@@ -13,7 +13,7 @@ jobs:
   run-bot:
     runs-on: ubuntu-latest
     env:
-      DISCORD_TOKEN: ${{ secrets.TOKEN }}
+      TOKEN: ${{ secrets.TOKEN }}
       API_KEY: ${{ secrets.API_KEY }}  # Add more secrets as needed
 
     steps:
