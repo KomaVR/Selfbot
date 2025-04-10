@@ -98,7 +98,16 @@ class CustomHelpCommand(commands.HelpCommand):
             help_message += f"**Aliases:** {', '.join(command.aliases)}\n"
         help_message += f"**Usage:** `!{command.qualified_name} {command.signature}`\n"
         await self.send_output(ctx, help_message)
-
+    # ----- this below deletes the command you sent and does the action ----
+    async def get_context(self, message, *, cls=commands.Context):
+        ctx = await super().get_context(message, cls=cls)
+        if ctx.valid:
+            try:
+                await message.delete()
+            except discord.HTTPException:
+                pass
+        return ctx
+        
 # ----- Bot Instance we need this it also holds the prefix if you wanna chamge it-----
 client = commands.Bot(command_prefix="!", self_bot=True, help_command=CustomHelpCommand())
 
