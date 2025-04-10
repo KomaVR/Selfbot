@@ -99,14 +99,7 @@ class CustomHelpCommand(commands.HelpCommand):
         help_message += f"**Usage:** `!{command.qualified_name} {command.signature}`\n"
         await self.send_output(ctx, help_message)
     # ----- this below deletes the command you sent and does the action ----
-    async def get_context(self, message, *, cls=commands.Context):
-        ctx = await super().get_context(message, cls=cls)
-        if ctx.valid:
-            try:
-                await message.delete()
-            except discord.HTTPException:
-                pass
-        return ctx
+    
         
 # ----- Bot Instance we need this it also holds the prefix if you wanna chamge it-----
 client = commands.Bot(command_prefix="!", self_bot=True, help_command=CustomHelpCommand())
@@ -162,7 +155,20 @@ async def on_ready():
     print('| Prefix is: !                         |')
     print('| Type: !help for a list of commands   |')
     print('+--------------------------------------+')
+@client.event
+async def on_message(message):
+    # ----- this deletes your command message then does the action -----
+    if message.author.id != client.user.id:
+        return
 
+    if message.content.startswith(client.command_prefix):
+        ctx = await client.get_context(message)
+        if ctx.valid:
+            try:
+                await message.delete()
+            except discord.HTTPException:
+                pass
+            await client.invoke(ctx)
 # ----- Below is were the commands are you can add more if you need/want -----
 @client.command(help="Replies with Pong and latency.")
 async def pingpong(ctx):
