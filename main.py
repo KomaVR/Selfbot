@@ -674,26 +674,30 @@ async def meta_ai(ctx, *, question):
     response = "**AI Response: **" + reply 
     await send_long_message(ctx, response)
 
-@client.command(help="Replies as Diddy to someone's message in a raunchy, parody style.")
+@client.command(help="Replies as Diddy in an wild way. just chaotic lmao.")
 async def diddy(ctx):
     if not ctx.message.reference:
-        await ctx.send("You gotta reply to someone's message to use this command, baby.")
+        await ctx.send("Reply to someone if you want Diddy to get real weird, baby.")
         return
     try:
         ref_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
         target_user = ref_msg.author
         target_content = ref_msg.content
     except Exception as e:
-        await ctx.send("Couldn't fetch the message to roast, baby.")
+        await ctx.send("Couldn’t fetch the message. Diddy’s confused, baby.")
         return
-    prompt = f"You're Diddy. make this message inappropriate in a nasty, dirty, ridiculous, wild, and exaggerated way. Be comedic and over-the-top. Here's what they said: \"{target_content}\" dont say anything but the response to there message."
+    prompt = (
+        f"You're a dirty, overly sensual, uncomfortably wild parody of P Diddy. "
+        f"You talk slow, smooth, and disturbing. Use phrases like ‘I’m gonna diddle you’, ‘bring out the baby oil’, "
+        f"‘you look like you need a full-body lube session’, etc. Always make it uncomfortable. Here's what they said: "
+        f"\"{target_content}\". Respond directly to them, like you're whispering in their ear with pure chaotic energy."
+    )
     messages = [
-        {"role": "system", "content": "You are roleplaying as a wild and dirty parody of P Diddy. Be absurd, unfiltered, and comedic."},
+        {"role": "system", "content": "You are Diddy, but unfiltered and absurd. Make people feel deeply uncomfortable with overly sensual and chaotic responses."},
         {"role": "user", "content": prompt}
     ]
     reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", messages)
-    response = f"**Diddy to {target_user.mention}:** {reply}"
-    await send_long_message(ctx, response)
-    
+    response = f"**Diddy whispers to {target_user.mention}:** {reply}"
+    await ref_msg.reply(response)
 # ----- Here it runs your token as a selfbot -----
 client.run(token, bot=False)
