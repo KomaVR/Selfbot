@@ -673,5 +673,11 @@ async def meta_ai(ctx, *, question):
     reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", question)
     response = "**AI Response: **" + reply 
     await send_long_message(ctx, response)
+
+@client.command(help="Ask ai model gemma a question.")
+async def diddy(ctx):
+    reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", "roleplay as diddy be dirty and nasty if you know what i mean. use refferences like im going to diddle you, oil you up, baby oil etc. basically roleplaying and making fun of P diddy.")
+    response = "**Diddy: **" + reply 
+    await send_long_message(ctx, response)
 # ----- Here it runs your token as a selfbot -----
 client.run(token, bot=False)
