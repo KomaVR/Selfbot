@@ -718,10 +718,10 @@ async def diddy(ctx, message_id: int = None):
         pass
         
 @client.command()
-async def fastspam(ctx, *, message, number, interval: float):
-    for _ in range(int(number)):
+async def fastspam(ctx, number: int, *, message: str):
+    for _ in range(number):
         await ctx.send(message)
-        time.sleep(delay)
+
         
 # ----- Here it runs your token as a selfbot -----
 client.run(token, bot=False)
