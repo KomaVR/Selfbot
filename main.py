@@ -674,30 +674,43 @@ async def meta_ai(ctx, *, question):
     response = "**AI Response: **" + reply 
     await send_long_message(ctx, response)
 
-@client.command(help="Replies as Diddy in an wild way. just chaotic lmao.")
-async def diddy(ctx):
-    if not ctx.message.reference:
-        await ctx.send("Reply to someone if you want Diddy to get real weird, baby.")
-        return
-    try:
+@client.command(help="Diddy replies for you. Use as reply or provide message ID.")
+async def diddy(ctx, message_id=None):
+    ref_msg = None
+    if ctx.message.reference:
         ref_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-        target_user = ref_msg.author
-        target_content = ref_msg.content
-    except Exception as e:
-        await ctx.send("Couldn’t fetch the message. Diddy’s confused, baby.")
+    elif message_id:
+        try:
+            ref_msg = await ctx.channel.fetch_message(int(message_id))
+        except:
+            await ctx.send("Couldn't find that message ID, baby.")
+            return
+    else:
+        await ctx.send("You gotta reply to a message or give me the message ID, baby.")
         return
-    prompt = (
-        f"You're a dirty, overly sensual, uncomfortably wild parody of P Diddy. "
-        f"You talk slow, smooth, and disturbing. Use phrases like ‘I’m gonna diddle you’, ‘bring out the baby oil’, "
-        f"‘you look like you need a full-body lube session’, etc. Always make it uncomfortable. Here's what they said: "
-        f"\"{target_content}\". Respond directly to them, like you're whispering in their ear with pure chaotic energy."
-    )
-    messages = [
-        {"role": "system", "content": "You are Diddy, but unfiltered and absurd. Make people feel deeply uncomfortable with overly sensual and chaotic responses."},
-        {"role": "user", "content": prompt}
-    ]
-    reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", messages)
-    response = f"**Diddy whispers to {target_user.mention}:** {reply}"
+    target_user = ref_msg.author
+    target_content = ref_msg.content
+    async with ctx.typing():
+        await asyncio.sleep(random.uniform(1.0, 2.5))
+        prompt_styles = [
+            "You are a parody of P Diddy. Respond like you're about to massage someone with warm baby oil and quote 90s R&B lines.",
+            "You're dirty Diddy. You make people feel deeply uncomfortable with slow, intimate, unsettling compliments.",
+            "You're absurd, sensual, and chaotic. Whisper nonsense like 'you smell like cocoa butter dreams'."
+        ]
+        prompt = (
+            f"{random.choice(prompt_styles)} Here's what they said: \"{target_content}\". "
+            f"Respond directly to them in an overly sensual way."
+        )
+        messages = [
+            {"role": "system", "content": "You are Diddy. Be uncomfortably smooth, weird, dirty, and intimate. Make the user question reality."},
+            {"role": "user", "content": prompt}
+        ]
+        reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", messages)
+        response = f"**Diddy whispers to {target_user.mention}:** {reply}"
     await ref_msg.reply(response)
+    try:
+        await ref_msg.add_reaction("🧴")
+    except:
+        pass
 # ----- Here it runs your token as a selfbot -----
 client.run(token, bot=False)
