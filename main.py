@@ -675,15 +675,18 @@ async def meta_ai(ctx, *, question):
     await send_long_message(ctx, response)
 
 @client.command(help="Diddy replies for you. Use as reply or provide message ID.")
-async def diddy(ctx, message_id=None):
+async def diddy(ctx, message_id: int = None):
     ref_msg = None
     if ctx.message.reference:
         ref_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
     elif message_id:
-        try:
-            ref_msg = await ctx.channel.fetch_message(int(message_id))
-        except:
-            await ctx.send("Couldn't find that message ID, baby.")
+        ref_msg = None
+        async for msg in ctx.channel.history(limit=100):
+            if msg.id == message_id:
+                ref_msg = msg
+                break
+        if ref_msg is None:
+            await ctx.send("That message ID isn’t in this channel or is too old, baby.")
             return
     else:
         await ctx.send("You gotta reply to a message or give me the message ID, baby.")
@@ -712,5 +715,6 @@ async def diddy(ctx, message_id=None):
         await ref_msg.add_reaction("🧴")
     except:
         pass
+        
 # ----- Here it runs your token as a selfbot -----
 client.run(token, bot=False)
