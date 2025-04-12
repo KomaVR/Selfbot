@@ -717,7 +717,7 @@ async def diddy(ctx, message_id: int = None):
     except:
         pass
         
-@client.command()
+@client.command(help="Spams Extremely fast. (Warning cam cause rate limiting at high amounts)")
 async def fastspam(ctx, number: int, *, message: str):
     for _ in range(number):
         await ctx.send(message)
