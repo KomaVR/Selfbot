@@ -674,25 +674,26 @@ async def meta_ai(ctx, *, question):
     response = "**AI Response: **" + reply 
     await send_long_message(ctx, response)
 
-@client.command(help="Ask ai model gemma a question.")
-async def diddy(ctx, *, question: str = None):
-    user_id = ctx.author.id
-    if question and question.strip().lower() == "reset":
-        conversation_memory.pop(user_id, None)
-        await ctx.send("**Diddy:** Alright baby, memory wiped. Let's start fresh.")
+@client.command(help="Replies as Diddy to someone's message in a raunchy, parody style.")
+async def diddy(ctx):
+    if not ctx.message.reference:
+        await ctx.send("You gotta reply to someone's message to use this command, baby.")
         return
-    if user_id not in conversation_memory:
-        conversation_memory[user_id] = [
-            {"role": "system", "content": "You are roleplaying as a wild and raunchy parody of P Diddy. Be exaggerated, dirty, and comedic."}
-        ]
-    if question:
-        conversation_memory[user_id].append({"role": "user", "content": question})
-    else:
-        await ctx.send("Ask me something nasty, baby.")
+    try:
+        ref_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+        target_user = ref_msg.author
+        target_content = ref_msg.content
+    except Exception as e:
+        await ctx.send("Couldn't fetch the message to roast, baby.")
         return
-    reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", conversation_memory[user_id])
-    conversation_memory[user_id].append({"role": "assistant", "content": reply})
-    response = "**Diddy:** " + reply
+    prompt = f"You're Diddy. make this message inappropriate in a nasty, dirty, ridiculous, wild, and exaggerated way. Be comedic and over-the-top. Here's what they said: \"{target_content}\" dont say anything but the response to there message."
+    messages = [
+        {"role": "system", "content": "You are roleplaying as a wild and dirty parody of P Diddy. Be absurd, unfiltered, and comedic."},
+        {"role": "user", "content": prompt}
+    ]
+    reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", messages)
+    response = f"**Diddy to {target_user.mention}:** {reply}"
     await send_long_message(ctx, response)
+    
 # ----- Here it runs your token as a selfbot -----
 client.run(token, bot=False)
