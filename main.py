@@ -675,9 +675,24 @@ async def meta_ai(ctx, *, question):
     await send_long_message(ctx, response)
 
 @client.command(help="Ask ai model gemma a question.")
-async def diddy(ctx):
-    reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", "roleplay as diddy be dirty and nasty if you know what i mean. use refferences like im going to diddle you, oil you up, baby oil etc. basically roleplaying and making fun of P diddy.")
-    response = "**Diddy: **" + reply 
+async def diddy(ctx, *, question: str = None):
+    user_id = ctx.author.id
+    if question and question.strip().lower() == "reset":
+        conversation_memory.pop(user_id, None)
+        await ctx.send("**Diddy:** Alright baby, memory wiped. Let's start fresh.")
+        return
+    if user_id not in conversation_memory:
+        conversation_memory[user_id] = [
+            {"role": "system", "content": "You are roleplaying as a wild and raunchy parody of P Diddy. Be exaggerated, dirty, and comedic."}
+        ]
+    if question:
+        conversation_memory[user_id].append({"role": "user", "content": question})
+    else:
+        await ctx.send("Ask me something nasty, baby.")
+        return
+    reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", conversation_memory[user_id])
+    conversation_memory[user_id].append({"role": "assistant", "content": reply})
+    response = "**Diddy:** " + reply
     await send_long_message(ctx, response)
 # ----- Here it runs your token as a selfbot -----
 client.run(token, bot=False)
