@@ -680,7 +680,6 @@ async def diddy(ctx, message_id: int = None):
     if ctx.message.reference:
         ref_msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
     elif message_id:
-        ref_msg = None
         async for msg in ctx.channel.history(limit=100):
             if msg.id == message_id:
                 ref_msg = msg
@@ -691,8 +690,10 @@ async def diddy(ctx, message_id: int = None):
     else:
         await ctx.send("You gotta reply to a message or give me the message ID, baby.")
         return
+
     target_user = ref_msg.author
     target_content = ref_msg.content
+
     async with ctx.typing():
         await asyncio.sleep(random.uniform(1.0, 2.5))
         prompt_styles = [
@@ -701,20 +702,21 @@ async def diddy(ctx, message_id: int = None):
             "You're absurd, sensual, and chaotic. Whisper nonsense like 'you smell like cocoa butter dreams'."
         ]
         prompt = (
-            f"{random.choice(prompt_styles)} Here's what they said: \"{target_content}\". "
-            f"Respond directly to them in an overly sensual way."
+            f"{random.choice(prompt_styles)}\n"
+            f"The user said: \"{target_content}\"\n"
+            f"Respond to them in character."
         )
-        messages = [
-            {"role": "system", "content": "You are Diddy. Be uncomfortably smooth, weird, dirty, and intimate. Make the user question reality."},
-            {"role": "user", "content": prompt}
-        ]
-        reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", messages)
+
+        reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", prompt)
         response = f"**Diddy whispers to {target_user.mention}:** {reply}"
+
     await ref_msg.reply(response)
+
     try:
         await ref_msg.add_reaction("🧴")
     except:
         pass
+
         
 # ----- Here it runs your token as a selfbot -----
 client.run(token, bot=False)
