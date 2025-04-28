@@ -8,6 +8,7 @@ from discord.ext import commands
 token = os.getenv("TOKEN")
 GROQ_API_KEY = os.getenv("API_KEY")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
+running = True
 
 HEADERS = {
     "Authorization": f"Bearer {GROQ_API_KEY}",
@@ -674,12 +675,32 @@ async def meta_ai(ctx, *, question):
     response = "**AI Response: **" + reply 
     await send_long_message(ctx, response)
     
-@client.command(help="Repeats your message a specified number of times.")
+@client.command(help="Repeats your message a specified number of times with a delay.")
 async def repeatcount(ctx, times: int, delay: int, *, message: str):
-    for i in range(1, times + 1):
-        await ctx.send(f"{message} ({i})")
-        time.sleep(delay)
+    global running
+    if not running:
+        await ctx.send("Command execution is currently stopped.")
+        return
 
+    for i in range(1, times + 1):
+        if not running:
+            await ctx.send("Command execution has been stopped midway.")
+            break
+        await ctx.send(f"{message} ({i})")
+        await asyncio.sleep(delay)
+
+@client.command(help="Stops all running commands.")
+async def stopcommands(ctx):
+    global running
+    running = False
+    await ctx.send("Commands have been stopped.")
+
+@client.command(help="Resumes command execution.")
+async def startcommands(ctx):
+    global running
+    running = True
+    await ctx.send("Commands have been resumed.")
+    
 @client.command(help="Diddy replies for you. Use as reply or provide message ID.")
 async def diddy(ctx, message_id: int = None):
     ref_msg = None
