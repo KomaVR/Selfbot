@@ -678,6 +678,7 @@ async def meta_ai(ctx, *, question):
 async def repeatcount(ctx, times: int, delay: int, *, message: str):
     for i in range(1, times + 1):
         await ctx.send(f"{message} ({i})")
+        time.sleep(delay)
 
 @client.command(help="Diddy replies for you. Use as reply or provide message ID.")
 async def diddy(ctx, message_id: int = None):
