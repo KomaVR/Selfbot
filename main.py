@@ -676,7 +676,7 @@ async def meta_ai(ctx, *, question):
     await send_long_message(ctx, response)
     
 @client.command(help="Repeats your message a specified number of times with a delay.")
-async def repeatcount(ctx, times: int, delay: int, *, message: str):
+async def repeat(ctx, times: int, delay: int, *, message: str):
     global running
     if not running:
         await ctx.send("Command execution is currently stopped.")
@@ -699,7 +699,7 @@ async def stopcommands(ctx):
 async def startcommands(ctx):
     global running
     running = True
-    await ctx.send("Commands have been resumed.")
+    await ctx.send("Commands have been resumed. You can now run more commands.")
     
 @client.command(help="Diddy replies for you. Use as reply or provide message ID.")
 async def diddy(ctx, message_id: int = None):
