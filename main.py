@@ -673,6 +673,11 @@ async def meta_ai(ctx, *, question):
     reply = query_groq("meta-llama/llama-4-scout-17b-16e-instruct", question)
     response = "**AI Response: **" + reply 
     await send_long_message(ctx, response)
+    
+@client.command(help="Repeats your message a specified number of times.")
+async def repeatcount(ctx, times: int, *, message: str):
+    for i in range(1, times + 1):
+        await ctx.send(f"{message} ({i})")
 
 @client.command(help="Diddy replies for you. Use as reply or provide message ID.")
 async def diddy(ctx, message_id: int = None):
