@@ -283,7 +283,17 @@ async def purge(ctx, amount: int):
             await msg.delete()
             count += 1
     await ctx.send(f"Purged {count} messages.")
-
+@client.command(help="Sends a trans flag in ASCII art.")
+async def transflag(ctx):
+    flag = (
+        "**" + "█" * 30 + "**\n"  
+        "__" + "█" * 30 + "__\n"  
+        "" + "█" * 30 + "\n"      
+        "__" + "█" * 30 + "__\n"  
+        "**" + "█" * 30 + "**"    
+    )
+    await ctx.send(flag)
+    
 @client.command(help="Mass DM: sends a DM to every member of the server (except you).")
 async def massdm(ctx, *, message: str):
     sent_count = 0
