@@ -675,7 +675,7 @@ async def meta_ai(ctx, *, question):
     await send_long_message(ctx, response)
     
 @client.command(help="Repeats your message a specified number of times.")
-async def repeatcount(ctx, times: int, *, message: str):
+async def repeatcount(ctx, times: int, delay: int, *, message: str):
     for i in range(1, times + 1):
         await ctx.send(f"{message} ({i})")
 
